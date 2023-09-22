@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="red-bg"></div>
+    <main>
+        <section class="calculator">
+            <div class="container">
+                <div class="calculator__wrapper">
+                    <div class="calculator__form">
+                        <h4>Estimate Your Purchase Details</h4>
+                        <form>
+                            <label for="msrp" class="form-group">Vehicle Price
+                                <div class="inner-field-wrap">
+                                    <span class="dollar">$</span>
+                                    <input type="text" name="msrp" id="msrp" inputmode="numeric" value="0">
+                                </div>
+                            </label>
+                            <label for="down-payment" class="form-group">Down Payment Amount
+                                <div class="inner-field-wrap">
+                                    <span class="dollar">$</span>
+                                    <input type="text" name="down-payment" id="down-payment" inputmode="numeric" value="0">
+                                </div>
+                            </label>
+                            <label for="trade-in-value" class="form-group">What's Your Trade In Worth?
+                                <div class="inner-field-wrap">
+                                    <span class="dollar">$</span>
+                                    <input type="text" name="trade-in-value" id="trade-in-value" inputmode="numeric" value="0">
+                                </div>
+                            </label>
+                            <label for="percentage-increase" class="form-group">Enter Your Financing Rate (APR)
+                                <div class="inner-field-wrap">
+                                    <input type="number" name="percentage-increase" id="percentage-increase" placeholder="0.00%">
+                                    <span class="dollar">%</span>
+                                </div>
+                            </label>
+                            <label for="percentage-increase" class="form-group">Enter Your States Sales Tax
+                                <div class="inner-field-wrap">
+                                    <input type="number" name="percentage-increase" id="percentage-increase" placeholder="0.00%">
+                                    <span class="dollar">%</span>
+                                </div>
+                            </label>
+                            <div class="term">
+                                <h4>Term</h4>
+                                <ul class="term-listing"></ul>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="calculator__checkout">
+                        <div class="calculator__checkout-header">
+                            <h4>Estimated Monthly Payment</h4>
+                        <div class="calculator__checkout-heading">
+                            <span class="dollar-span">$</span>
+                            <span class="result"></span>
+                            <span class="per-month">/mo</span>
+                        </div>
+                        <p class="term-length">Term Length 72 Months</p>
+                        </div>
+                        <div class="loan-details">
+                            <h4>Loan Details</h4>
+                            <ul class="loan-details-list">
+                                <li>
+                                    <span>Vehicle Price</span>
+                                    <span>$0</span>
+                                </li>
+                                <li>
+                                    <span>Down Payment</span>
+                                    <span>-$0</span>
+                                </li>
+                                <li>
+                                    <span>Trade In Value</span>
+                                    <span>-$0</span>
+                                </li>
+                                <li>
+                                    <span>Estimated Sales Tax</span>
+                                    <span>$0</span>
+                                </li>
+                                <li>
+                                    <span>Estimated Financing Rate</span>
+                                    <span>$0</span>
+                                </li>
+                                <li>
+                                    <span>Dealer Fees</span>
+                                    <span>Not Included</span>
+                                </li>
+                            </ul>
+                            <div class="total-estimated">
+                                <ul>
+                                    
+                            </ul>
+                            </div>
+                        </div>
+                        <a href="" class="search-cars" target="_blank">SEARCH CARS IN THIS PAYMENT RANGE</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="index.js"></script>
+</body>
+</html>
