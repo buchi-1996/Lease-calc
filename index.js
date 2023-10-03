@@ -11,6 +11,9 @@ class Calculator {
         this.msrp = document.querySelector("#msrp");
         this.downPayment = document.querySelector("#down-payment");
         this.tradeInValue = document.querySelector("#trade-in-value");
+        this.apr = document.querySelector("#apr");
+        this.salesTax = document.querySelector("#sales-tax");
+        
         this.result = document.querySelector(".result");
         this.terms = document.querySelector(".term-listing");
         this.termLength = document.querySelector(".term-length");
@@ -22,6 +25,8 @@ class Calculator {
         this.msrp.addEventListener("keyup", this.updateResult);
         this.downPayment.addEventListener("keyup", this.updateResult);
         this.tradeInValue.addEventListener("keyup", this.updateResult);
+        this.apr.addEventListener("keyup", this.validatePercent);
+        this.salesTax.addEventListener("keyup", this.validatePercent);
         this.msrp.addEventListener("keydown", this.validateInput);
         this.downPayment.addEventListener("keydown", this.validateInput);
         this.tradeInValue.addEventListener("keydown", this.validateInput);
@@ -34,12 +39,23 @@ class Calculator {
         this.showTerms();
     };
 
+
+
     calculateResult = () => {
         if (
             +this.downPayment.value.trim().replace(/,/g, "") >=
             +this.msrp.value.trim().replace(/,/g, "")
         ) {
             return 0;
+        }
+        const loanAmount = this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "") - this.tradeInValue.value.trim().replace(/,/g, "")
+
+        if(this.apr.value !== ''){
+            return Math.round(((this.apr.value / 1200) * loanAmount) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth)))))
+        }
+         
+        if(this.salesTax.value !== ''){
+            return Math.round((this.calculateSalesTax() / this.selectedMonth ) + this.result.innerText.trim().replace(/,/g, "") )
         }
 
         return (
@@ -50,8 +66,22 @@ class Calculator {
                 this.selectedMonth
             ) || 0
         );
+        // return ((this.apr.value / 1200) * +this.getTotalEstimated().trim().replace(/,/g, "")) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth)))) || 0
+
     };
 
+    calculateApr = () => {
+        console.log(((+this.apr.value / 1200) * +this.getTotalEstimated().trim().replace(/,/g, "")) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth)))))
+        return ((this.apr.value / 1200) * +this.getTotalEstimated().trim().replace(/,/g, "")) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth))))
+        
+    }
+
+
+    calculateSalesTax = () => {
+       return (this.salesTax.value.trim().replace(/,/g, "") / 100) * this.msrp.value.trim().replace(/,/g, "")
+    }
+
+    
     getTotalEstimated = () => {
         if (
             +this.downPayment.value.trim().replace(/,/g, "") >=
@@ -61,12 +91,24 @@ class Calculator {
         ) {
             return 0;
         }
+
+        const loanAmount = this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "") - this.tradeInValue.value.trim().replace(/,/g, "")
+
         return Math.round(
-            this.msrp.value.trim().replace(/,/g, "") -
+           ( this.msrp.value.trim().replace(/,/g, "") -
             this.downPayment.value.trim().replace(/,/g, "") -
-            this.tradeInValue.value.trim().replace(/,/g, "")
+            this.tradeInValue.value.trim().replace(/,/g, "") + this.calculateSalesTax() ) + ((this.salesTax.value === '' && this.apr.value === '') ? 0 : ((this.result.innerText.trim().replace(/,/g, "") * this.selectedMonth) - loanAmount))
         ).toLocaleString("en-US");
+
+        // console.log(this.calculateResult())
+        // return (+this.calculateResult() * +this.selectedMonth).toLocaleString("en-US")
     };
+
+    validatePercent = () => {
+        console.log(this.apr)
+        this.initializeApp()
+    }
+    
 
     updateResult = (e) => {
         console.log(this.msrp.value.length);
@@ -92,6 +134,8 @@ class Calculator {
         }
         this.initializeApp();
     };
+
+    
 
     validateInput = (e) => {
         if (+e.target.value === 0) {
@@ -123,11 +167,11 @@ class Calculator {
     </li>
     <li>
         <span>Estimated Sales Tax</span>
-        <span>$0</span>
+        <span>+$${this.calculateSalesTax()}</span>
     </li>
     <li>
         <span>Estimated Financing Rate</span>
-        <span>$0</span>
+        <span>+$${(this.salesTax.value === '' && this.apr.value === '') ? 0 : (this.result.innerText.trim().replace(/,/g, "") * this.selectedMonth) - ((this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "")) - this.tradeInValue.value.trim().replace(/,/g, ""))}</span>
     </li>
     <li>
         <span>Dealer Fees</span>
