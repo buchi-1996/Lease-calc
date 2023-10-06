@@ -13,6 +13,7 @@ class Calculator {
         this.tradeInValue = document.querySelector("#trade-in-value");
         this.apr = document.querySelector("#apr");
         this.salesTax = document.querySelector("#sales-tax");
+        this.searchBtn = document.querySelector('.search-cars')
         
         this.result = document.querySelector(".result");
         this.terms = document.querySelector(".term-listing");
@@ -31,49 +32,41 @@ class Calculator {
         this.downPayment.addEventListener("keydown", this.validateInput);
         this.tradeInValue.addEventListener("keydown", this.validateInput);
         this.terms.addEventListener("click", this.handleMonthChange);
+
     }
 
     // Methods
     initializeApp = () => {
-        this.result.innerText = this.calculateResult().toLocaleString("en-US");
+        this.estimated = this.calculateResult()
+        this.searchBtn.href = `https://development.carzino.com/cars/?radius=${this.msrp.value !== 0 ? (this.msrp.value.trim().replace(/,/g, "")) : 15000}`
+        this.result.innerText = Math.round(this.calculateResult()).toLocaleString("en-US");
         this.showTerms();
     };
 
 
 
     calculateResult = () => {
+        const loanAmount = this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "") - this.tradeInValue.value.trim().replace(/,/g, "")
         if (
             +this.downPayment.value.trim().replace(/,/g, "") >=
             +this.msrp.value.trim().replace(/,/g, "")
         ) {
             return 0;
         }
-        const loanAmount = this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "") - this.tradeInValue.value.trim().replace(/,/g, "")
-
-        if(this.apr.value !== ''){
-            return Math.round(((this.apr.value / 1200) * loanAmount) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth)))))
-        }
-         
-        if(this.salesTax.value !== ''){
-            return Math.round((this.calculateSalesTax() / this.selectedMonth ) + this.result.innerText.trim().replace(/,/g, "") )
-        }
 
         return (
             Math.round(
-                (this.msrp.value.trim().replace(/,/g, "") -
-                    this.downPayment.value.trim().replace(/,/g, "") -
-                    this.tradeInValue.value.trim().replace(/,/g, "")) /
+                (loanAmount + ((this.apr.value !== '') ? this.calculateApr() + (this.salesTax.value !== '' ? (((this.salesTax.value /100) * this.calculateApr()) + this.calculateApr()) - this.calculateApr() : 0 )  : 0) + ((this.salesTax.value !== '') ? this.calculateSalesTax() : 0 ) ) /
                 this.selectedMonth
             ) || 0
         );
-        // return ((this.apr.value / 1200) * +this.getTotalEstimated().trim().replace(/,/g, "")) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth)))) || 0
 
     };
 
     calculateApr = () => {
-        console.log(((+this.apr.value / 1200) * +this.getTotalEstimated().trim().replace(/,/g, "")) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth)))))
-        return ((this.apr.value / 1200) * +this.getTotalEstimated().trim().replace(/,/g, "")) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth))))
-        
+        const loanAmount = this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "") - this.tradeInValue.value.trim().replace(/,/g, "")
+        const apr = ((this.apr.value / 1200) * loanAmount) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth))))
+        return (apr * this.selectedMonth) - loanAmount
     }
 
 
@@ -94,18 +87,14 @@ class Calculator {
 
         const loanAmount = this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "") - this.tradeInValue.value.trim().replace(/,/g, "")
 
-        return Math.round(
-           ( this.msrp.value.trim().replace(/,/g, "") -
-            this.downPayment.value.trim().replace(/,/g, "") -
-            this.tradeInValue.value.trim().replace(/,/g, "") + this.calculateSalesTax() ) + ((this.salesTax.value === '' && this.apr.value === '') ? 0 : ((this.result.innerText.trim().replace(/,/g, "") * this.selectedMonth) - loanAmount))
-        ).toLocaleString("en-US");
+        return ( loanAmount + ((this.apr.value !== '') ? this.calculateApr() + (this.salesTax.value !== '' ? (((this.salesTax.value /100) * this.calculateApr()) + this.calculateApr()) - this.calculateApr() : 0 )  : 0) + ((this.salesTax.value !== '') ? this.calculateSalesTax() : 0 ))
+        
 
         // console.log(this.calculateResult())
         // return (+this.calculateResult() * +this.selectedMonth).toLocaleString("en-US")
     };
 
-    validatePercent = () => {
-        console.log(this.apr)
+    validatePercent = (e) => {
         this.initializeApp()
     }
     
@@ -167,11 +156,11 @@ class Calculator {
     </li>
     <li>
         <span>Estimated Sales Tax</span>
-        <span>+$${this.calculateSalesTax()}</span>
+        <span>+$${Math.round(this.calculateSalesTax())}</span>
     </li>
     <li>
         <span>Estimated Financing Rate</span>
-        <span>+$${(this.salesTax.value === '' && this.apr.value === '') ? 0 : (this.result.innerText.trim().replace(/,/g, "") * this.selectedMonth) - ((this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "")) - this.tradeInValue.value.trim().replace(/,/g, ""))}</span>
+        <span>+$${(this.apr.value === '') ? 0 : Math.round(((this.apr.value !== '') ? this.calculateApr() + (this.salesTax.value !== '' ? (((this.salesTax.value /100) * this.calculateApr()) + this.calculateApr()) - this.calculateApr() : 0 )  : 0)).toLocaleString('en-US')}</span>
     </li>
     <li>
         <span>Dealer Fees</span>
@@ -180,11 +169,11 @@ class Calculator {
 
         this.totalEstimated.innerHTML = `<li>
         <span>Total Vehicle Loan Amount</span>
-        <span>$${this.getTotalEstimated()}</span>
+        <span>$${Math.round(this.getTotalEstimated()).toLocaleString('en-US')}</span>
     </li>
     <li>
         <span>Monthly Payment</span>
-        <span>$${this.calculateResult()}</span>
+        <span>$${Math.round(this.calculateResult()).toLocaleString('en-US')}</span>
     </li>`;
     };
 
