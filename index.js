@@ -73,7 +73,9 @@ class Calculator {
         ) {
             return 0
         }
-        return (apr * this.selectedMonth) - loanAmount
+
+        console.log((apr * this.selectedMonth) - loanAmount, loanAmount)
+        return Math.abs((apr * this.selectedMonth) - loanAmount)
     }
 
 
@@ -176,7 +178,7 @@ class Calculator {
 
         this.totalEstimated.innerHTML = `<li>
         <span>Total Vehicle Loan Amount</span>
-        <span>$${Math.round(this.getTotalEstimated()).toLocaleString('en-US')}</span>
+        <span>$${(this.getTotalEstimated() < 1 ) ? 0 : Math.round(this.getTotalEstimated()).toLocaleString('en-US')}</span>
     </li>
     <li>
         <span>Monthly Payment</span>
