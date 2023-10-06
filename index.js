@@ -35,16 +35,16 @@ class Calculator {
 
     }
 
-    // Methods
+    // Initialize App On Load of Browser
     initializeApp = () => {
-        this.estimated = this.calculateResult()
-        this.searchBtn.href = `https://development.carzino.com/cars/?radius=${this.msrp.value !== 0 ? (this.msrp.value.trim().replace(/,/g, "")) : 15000}`
-        this.result.innerText = Math.round(this.calculateResult()).toLocaleString("en-US");
+        this.estimated = (this.calculateResult() < 1) ? 0 : this.calculateResult()
+        this.searchBtn.href = `https://development.carzino.com/cars/?radius=${+this.msrp.value.trim().replace(/,/g, "") === 0 ? 15000 : this.msrp.value.trim().replace(/,/g, "")}`
+        this.result.innerText = (this.calculateResult() < 1) ? 0 : Math.round(this.calculateResult()).toLocaleString("en-US");
         this.showTerms();
     };
 
 
-
+    // Calculate and Get Latest Result Based on Keyup and Keydown Events
     calculateResult = () => {
         const loanAmount = this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "") - this.tradeInValue.value.trim().replace(/,/g, "")
         if (
@@ -64,6 +64,7 @@ class Calculator {
 
     };
 
+    // Method To Calculate APR
     calculateApr = () => {
         const loanAmount = this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "") - this.tradeInValue.value.trim().replace(/,/g, "")
         const apr = ((this.apr.value / 1200) * loanAmount) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth))))
@@ -73,17 +74,15 @@ class Calculator {
         ) {
             return 0
         }
-
-        console.log((apr * this.selectedMonth) - loanAmount, loanAmount)
         return Math.abs((apr * this.selectedMonth) - loanAmount)
     }
 
-
+    // Method To Calculate Sales Tax
     calculateSalesTax = () => {
        return (this.salesTax.value.trim().replace(/,/g, "") / 100) * this.msrp.value.trim().replace(/,/g, "")
     }
 
-    
+    // Method to cClculate Total Loan Amount
     getTotalEstimated = () => {
         if (
             +this.downPayment.value.trim().replace(/,/g, "") >=
@@ -97,34 +96,28 @@ class Calculator {
         const loanAmount = this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "") - this.tradeInValue.value.trim().replace(/,/g, "")
 
         return ( loanAmount + ((this.apr.value !== '') ? this.calculateApr() + (this.salesTax.value !== '' ? (((this.salesTax.value /100) * this.calculateApr()) + this.calculateApr()) - this.calculateApr() : 0 )  : 0) + ((this.salesTax.value !== '') ? this.calculateSalesTax() : 0 ))
-        
-
-        // console.log(this.calculateResult())
-        // return (+this.calculateResult() * +this.selectedMonth).toLocaleString("en-US")
     };
 
+    // Update App on Keyup Event In Percentage Field
     validatePercent = (e) => {
         this.initializeApp()
     }
     
-
-    updateResult = (e) => {
-        console.log(this.msrp.value.length);
+ // Keyup Validation for Text Input
+ updateResult = (e) => {
+        let num = e.target.value.replace(/,/gi, "");
 
         if (e.target.value.length === 0) {
-            console.log("yes", e.keyCode);
             if (e.keyCode === 8 || e.keyCode === 46) {
                 e.target.value = 0;
             }
         }
 
-        // e.target.value.toLocaleString('en-US')
-        // console.log(BigInt(+e.target.value.trim().replace(/,/g, '')))
-        let num = e.target.value.replace(/,/gi, "");
         let newNum = num
             .replace(/[^0-9,]/g, "")
             .split(/(?=(?:\d{3})+$)/)
             .join(",");
+
         e.target.value = newNum;
 
         if (e.target.value === "") {
@@ -134,13 +127,15 @@ class Calculator {
     };
 
     
-
+    // Keydown Validation for Text Input
     validateInput = (e) => {
         if (+e.target.value === 0) {
             e.target.value = "";
         }
     };
 
+
+    // Populate UI with Necessary Details
     showTerms = () => {
         this.terms.innerHTML = this.months
             .map((month) => {
@@ -182,18 +177,19 @@ class Calculator {
     </li>
     <li>
         <span>Monthly Payment</span>
-        <span>$${Math.round(this.calculateResult()).toLocaleString('en-US')}</span>
+        <span>$${(this.calculateResult() < 1) ? 0 : Math.round(this.calculateResult()).toLocaleString("en-US")}</span>
     </li>`;
     };
 
+    // Handle Month Change on Click of Each Month Term
     handleMonthChange = (e) => {
         if (e.target.classList.contains("list-item")) {
             this.selectedMonth = +e.target.dataset.month;
-            console.log(e.target.dataset.month);
         }
 
         this.initializeApp();
     };
 }
 
+// Instantiate Calculator App
 const calc = new Calculator();
