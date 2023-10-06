@@ -38,7 +38,8 @@ class Calculator {
     // Initialize App On Load of Browser
     initializeApp = () => {
         this.estimated = (this.calculateResult() < 1) ? 0 : this.calculateResult()
-        this.searchBtn.href = `https://development.carzino.com/cars/?radius=${+this.msrp.value.trim().replace(/,/g, "") === 0 ? 15000 : this.msrp.value.trim().replace(/,/g, "")}`
+        this.searchBtn.setAttribute('data-allow', (+this.msrp.value.trim().replace(/,/g, "") === 0 ) ? 0 : 1)
+        this.loadSearchBtn(this.searchBtn)
         this.result.innerText = (this.calculateResult() < 1) ? 0 : Math.round(this.calculateResult()).toLocaleString("en-US");
         this.showTerms();
     };
@@ -63,6 +64,21 @@ class Calculator {
         );
 
     };
+
+    loadSearchBtn = (item) => {
+        console.log(+item.dataset.allow)
+        if(+item.dataset.allow === 0){
+            item.style.background = '#aaa'
+            item.style.cursor = 'not-allowed'
+            item.style.pointerEvents = 'none'
+        }else{
+            item.style.pointerEvents = 'unset'
+            item.style.background = '#000'
+            item.style.cursor = 'pointer'
+        }
+
+        return item.href = `https://development.carzino.com/cars/?radius=200&max_price=${this.msrp.value.trim().replace(/,/g, "")}`
+    }
 
     // Method To Calculate APR
     calculateApr = () => {
