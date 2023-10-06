@@ -51,6 +51,7 @@ class Calculator {
             +this.downPayment.value.trim().replace(/,/g, "") >=
             +this.msrp.value.trim().replace(/,/g, "")
         ) {
+            
             return 0;
         }
 
@@ -66,6 +67,12 @@ class Calculator {
     calculateApr = () => {
         const loanAmount = this.msrp.value.trim().replace(/,/g, "") - this.downPayment.value.trim().replace(/,/g, "") - this.tradeInValue.value.trim().replace(/,/g, "")
         const apr = ((this.apr.value / 1200) * loanAmount) / (1 - (Math.pow((1 + (this.apr.value / 1200)), (-this.selectedMonth))))
+        if (
+            +this.downPayment.value.trim().replace(/,/g, "") >=
+            +this.msrp.value.trim().replace(/,/g, "")
+        ) {
+            return 0
+        }
         return (apr * this.selectedMonth) - loanAmount
     }
 
@@ -160,7 +167,7 @@ class Calculator {
     </li>
     <li>
         <span>Estimated Financing Rate</span>
-        <span>+$${(this.apr.value === '') ? 0 : Math.round(((this.apr.value !== '') ? this.calculateApr() + (this.salesTax.value !== '' ? (((this.salesTax.value /100) * this.calculateApr()) + this.calculateApr()) - this.calculateApr() : 0 )  : 0)).toLocaleString('en-US')}</span>
+        <span>+$${(this.apr.value === '' ) ? 0 : Math.round(((this.apr.value !== '') ? this.calculateApr() + (this.salesTax.value !== '' ? (((this.salesTax.value /100) * this.calculateApr()) + this.calculateApr()) - this.calculateApr() : 0 )  : 0)).toLocaleString('en-US')}</span>
     </li>
     <li>
         <span>Dealer Fees</span>
